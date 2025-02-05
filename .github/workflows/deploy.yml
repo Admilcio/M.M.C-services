@@ -25,15 +25,20 @@ jobs:
           echo "VITE_TWILIO_AUTH_TOKEN=${{ secrets.VITE_TWILIO_AUTH_TOKEN }}" >> .env
           echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" >> .env
 
-      # Configure Git user for committing
+      # Configure Git user
       - name: Configure Git user
         run: |
-          git config --global user.email "admydamata@gmail.com"
-          git config --global user.name "Admilcio"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
 
-      # Optional: Commit the updated .env file (make sure .env is in .gitignore)
+      # Commit the updated .env file
       - name: Commit Updated .env File (Optional)
         run: |
           git add .env
           git commit -m "Add secrets to .env file"
+
+      # Push to repository using the generated personal access token
+      - name: Push changes
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
           git push
