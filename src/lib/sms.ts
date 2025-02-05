@@ -105,7 +105,7 @@ ${notification.orderDetails.items.map(item =>
   `- ${item.name} (${item.quantity}x)`
 ).join('\n')}
 
-Total: €${notification.orderDetails.total.toFixed(2)}
+Total: Por confirmar!
 
 Morada de Entrega:
 ${notification.orderDetails.customer.address}
