@@ -23,6 +23,10 @@ jobs:
       - name: Install Netlify CLI
         run: npm install -g netlify-cli  # Install netlify-cli globally
 
+      - name: Link to Existing Netlify Site
+        run: |
+          netlify link --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}
+
       - name: Create .env File with Secrets
         run: |
           echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" > .env
