@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Append secrets to the existing .env file
+      # Append Secrets to .env File
       - name: Append Secrets to .env File
         run: |
           echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" >> .env
@@ -24,6 +24,12 @@ jobs:
           echo "VITE_TWILIO_ACCOUNT_SID=${{ secrets.VITE_TWILIO_ACCOUNT_SID }}" >> .env
           echo "VITE_TWILIO_AUTH_TOKEN=${{ secrets.VITE_TWILIO_AUTH_TOKEN }}" >> .env
           echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" >> .env
+
+      # Configure Git user for committing
+      - name: Configure Git user
+        run: |
+          git config --global user.Admilcio "GitHub Actions"
+          git config --global user.admydamata@gmail.com "actions@github.com"
 
       # Optional: Commit the updated .env file (make sure .env is in .gitignore)
       - name: Commit Updated .env File (Optional)
