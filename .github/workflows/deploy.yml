@@ -35,8 +35,6 @@ jobs:
 
       - name: Build Project
         run: npm run build
-
       - name: Deploy to Production
-        run: netlify deploy --prod  # Use netlify CLI to deploy
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}  # Ensure Netlify auth token is set from secrets
+        run: |
+          netlify deploy --prod --auth ${{ secrets.NETLIFY_AUTH_TOKEN }}
