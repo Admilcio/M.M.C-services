@@ -1,4 +1,4 @@
-name: Add Secrets to .env File
+name: Deploy App
 
 on:
   push:
@@ -6,18 +6,30 @@ on:
       - main
 
 jobs:
-  add-secrets-to-env:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Append Secrets to .env File
-      - name: Append Secrets to .env File
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Link to Existing Netlify Site
         run: |
-          echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" >> .env
+          netlify link --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Create .env File with Secrets
+        run: |
+          echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" > .env
           echo "VITE_RESEND_API_KEY=${{ secrets.VITE_RESEND_API_KEY }}" >> .env
           echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
           echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
@@ -25,20 +37,18 @@ jobs:
           echo "VITE_TWILIO_AUTH_TOKEN=${{ secrets.VITE_TWILIO_AUTH_TOKEN }}" >> .env
           echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" >> .env
 
-      # Configure Git user
-      - name: Configure Git user
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+      - name: Build Project
+        run: npm run build
 
-      # Commit the updated .env file
-      - name: Commit Updated .env File (Optional)
+      - name: Configure Git for Authentication
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Commit Changes to .env File
         run: |
           git add .env
           git commit -m "Add secrets to .env file"
-
-      # Push to repository using the generated personal access token
-      - name: Push changes
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
-          git push
+          git push https://github.com/${{ github.repository }} HEAD:${{ github.ref }} --force --quiet
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # Using the PAT from GitHub secrets
