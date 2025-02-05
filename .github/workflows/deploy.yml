@@ -1,0 +1,34 @@
+name: Deploy App
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Overwrite .env File
+        run: |
+          echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" > .env
+          echo "VITE_RESEND_API_KEY=${{ secrets.VITE_RESEND_API_KEY }}" >> .env
+          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
+          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
+          echo "VITE_TWILIO_ACCOUNT_SID=${{ secrets.VITE_TWILIO_ACCOUNT_SID }}" >> .env
+          echo "VITE_TWILIO_AUTH_TOKEN=${{ secrets.VITE_TWILIO_AUTH_TOKEN }}" >> .env
+          echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" >> .env
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Deploy to Production
+        run: npm run deploy
