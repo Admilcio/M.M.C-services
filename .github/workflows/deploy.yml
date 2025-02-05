@@ -1,6 +1,9 @@
 name: Deploy App
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -17,15 +20,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Overwrite .env File
+      - name: Create .env File with Secrets
         run: |
-          echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" > .env
-          echo "VITE_RESEND_API_KEY=${{ secrets.VITE_RESEND_API_KEY }}" >> .env
-          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
-          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
-          echo "VITE_TWILIO_ACCOUNT_SID=${{ secrets.VITE_TWILIO_ACCOUNT_SID }}" >> .env
-          echo "VITE_TWILIO_AUTH_TOKEN=${{ secrets.VITE_TWILIO_AUTH_TOKEN }}" >> .env
-          echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" >> .env
+          echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" > .env
+          echo "TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}" >> .env
+          echo "TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}" >> .env
 
       - name: Build Project
         run: npm run build
