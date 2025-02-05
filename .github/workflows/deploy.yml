@@ -20,6 +20,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli  # Install netlify-cli globally
+
       - name: Create .env File with Secrets
         run: |
           echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" > .env
@@ -30,4 +33,6 @@ jobs:
         run: npm run build
 
       - name: Deploy to Production
-        run: npm run deploy
+        run: netlify deploy --prod  # Use netlify CLI to deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}  # Ensure Netlify auth token is set from secrets
