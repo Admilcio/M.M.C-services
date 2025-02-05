@@ -28,8 +28,8 @@ jobs:
       # Configure Git user for committing
       - name: Configure Git user
         run: |
-          git config --global user.Admilcio "GitHub Actions"
-          git config --global user.admydamata@gmail.com "actions@github.com"
+          git config --global user.email "admydamata@gmail.com"
+          git config --global user.name "Admilcio"
 
       # Optional: Commit the updated .env file (make sure .env is in .gitignore)
       - name: Commit Updated .env File (Optional)
