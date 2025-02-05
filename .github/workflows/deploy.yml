@@ -9,24 +9,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # Checkout code from the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Setup Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
+      # Install project dependencies
       - name: Install Dependencies
         run: npm install
 
+      # Install Netlify CLI globally
       - name: Install Netlify CLI
-        run: npm install -g netlify-cli  # Install netlify-cli globally
+        run: npm install -g netlify-cli
 
-      - name: Link to Existing Netlify Site
-        run: |
-          netlify link --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}
-
+      # Set up .env file with secrets (if needed by your app)
       - name: Create .env File with Secrets
         run: |
           echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" > .env
@@ -37,8 +38,10 @@ jobs:
           echo "VITE_TWILIO_AUTH_TOKEN=${{ secrets.VITE_TWILIO_AUTH_TOKEN }}" >> .env
           echo "VITE_TWILIO_PHONE_NUMBER=${{ secrets.VITE_TWILIO_PHONE_NUMBER }}" >> .env
 
+      # Build the project
       - name: Build Project
         run: npm run build
+
+      # Deploy to Netlify
       - name: Deploy to Production
-        run: |
-          netlify deploy --prod --auth ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: netlify deploy --prod --auth ${{ secrets.NETLIFY_AUTH_TOKEN }}
