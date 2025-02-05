@@ -27,12 +27,12 @@ jobs:
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
 
-      # Link the directory to an existing Netlify site
+      # Link the directory to Netlify using Auth Token
       - name: Link to Netlify Site
         run: |
-          netlify link --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}
+          netlify link --auth ${{ secrets.NETLIFY_AUTH_TOKEN }}
 
-      # Create .env file from GitHub secrets (ensure you set these in your secrets)
+      # Create .env file from GitHub secrets
       - name: Create .env File with Secrets
         run: |
           echo "VITE_ADMIN_EMAIL=${{ secrets.VITE_ADMIN_EMAIL }}" > .env
