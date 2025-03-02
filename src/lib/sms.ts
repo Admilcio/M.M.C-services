@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 const TWILIO_ACCOUNT_SID = import.meta.env.VITE_TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = import.meta.env.VITE_TWILIO_AUTH_TOKEN;
 const TWILIO_PHONE_NUMBER = import.meta.env.VITE_TWILIO_PHONE_NUMBER;
-const ADMIN_PHONE = '+351912137525';
+const ADMIN_PHONE = '+351933659453';
 
 interface OrderNotification {
   orderDetails: {
