@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 const TWILIO_ACCOUNT_SID = import.meta.env.VITE_TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = import.meta.env.VITE_TWILIO_AUTH_TOKEN;
 const TWILIO_PHONE_NUMBER = import.meta.env.VITE_TWILIO_PHONE_NUMBER;
-const ADMIN_PHONE = '+351912137525';
+const ADMIN_PHONE = '+351933659453';
 
 interface OrderNotification {
   orderDetails: {
@@ -40,6 +40,9 @@ function validatePhoneNumber(phone: string): boolean {
   // Portuguese mobile numbers start with 9 and have 9 digits
   return /^9\d{8}$/.test(digits);
 }
+  // Format message
+  const sanitizeText = (text: string) =>
+    text.replace(/[\u2019]/g, "'").replace(/[\u2002]/g, " ");
 
 async function sendSMS(to: string, body: string): Promise<{ success: boolean; message: string }> {
   try {
@@ -80,38 +83,37 @@ export async function sendSMSNotification(notification: OrderNotification): Prom
     }
 
     // Format the message
-    const adminMessage = `
-Nova Encomenda de Pastelaria:
-
-Itens:
-${notification.orderDetails.items.map(item => 
-  `- ${item.name} (${item.quantity}x)`
-).join('\n')}
-
-Total: Por confirmar!
-
-Detalhes do Cliente:
-Nome: ${notification.orderDetails.customer.name}
-Telefone: ${notification.orderDetails.customer.phone}
-Morada: ${notification.orderDetails.customer.address}
-Código Postal: ${notification.orderDetails.customer.zip_code}
-${notification.orderDetails.special_instructions ? `\nInstruções Especiais: ${notification.orderDetails.special_instructions}` : ''}`;
-
-    const customerMessage = `
-Obrigado pela sua encomenda na M.M.C Pastelaria! Entraremos em contato brevemente!
-
-Detalhes da sua Encomenda:
-${notification.orderDetails.items.map(item => 
-  `- ${item.name} (${item.quantity}x)`
-).join('\n')}
-
-Total: Por confirmar!
-
-Morada de Entrega:
-${notification.orderDetails.customer.address}
-${notification.orderDetails.customer.zip_code}
-
-Vamos começar a preparar a sua encomenda imediatamente!`;
+    const adminMessage = sanitizeText(`
+    Nova Encomenda de Pastelaria:
+    
+    Itens:
+    ${notification.orderDetails.items
+      .map(item => `- ${item.name} (${item.quantity}x)`)
+      .join('\n')}
+    Total: A confirmar!
+    Cliente:
+    Nome: ${notification.orderDetails.customer.name}
+    Tel: ${notification.orderDetails.customer.phone}
+    Morada: ${notification.orderDetails.customer.address}
+    Cód. Postal: ${notification.orderDetails.customer.zip_code}
+    ${notification.orderDetails.special_instructions 
+      ? `\nNotas: ${notification.orderDetails.special_instructions.replace(/[^A-Za-z0-9., -]/g, '').slice(0, 20)}...` 
+      : ''}`
+    )
+    
+    const customerMessage = sanitizeText(`
+    Obrigado pela encomenda na M.M.C Pastelaria! Entraremos em contato em breve!
+    
+    Detalhes da Encomenda:
+    ${notification.orderDetails.items
+      .map(item => `- ${item.name} (${item.quantity}x)`)
+      .join('\n')}
+    Total: A confirmar!
+    Entrega:
+    ${notification.orderDetails.customer.address}
+    Cód. Postal: ${notification.orderDetails.customer.zip_code}
+    Preparamos a sua encomenda agora!`
+    );
 
     // Send SMS to admin
     const adminResult = await sendSMS(ADMIN_PHONE, adminMessage);
@@ -188,31 +190,23 @@ export async function sendBookingNotification(bookingDetails: {
     if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
       throw new Error('Missing Twilio configuration. Please check your environment variables.');
     }
-
-    // Format admin message
-    const adminMessage = `
-Nova Marcação:
-Serviço: ${bookingDetails.service.name}
-Data: ${bookingDetails.booking_date}
-Horário: ${bookingDetails.start_time} - ${bookingDetails.end_time}
-Cliente: ${bookingDetails.customer.full_name}
-Telefone: ${bookingDetails.customer.phone}
-Morada: ${bookingDetails.address}
-Código Postal: ${bookingDetails.zip_code}
-${bookingDetails.notes ? `Notas: ${bookingDetails.notes}` : ''}`;
-
+  
+  const adminMessage = sanitizeText(
+    `Nova Marcacao: ${bookingDetails.service.name}, ${bookingDetails.booking_date} ${bookingDetails.start_time}-${bookingDetails.end_time}. Cliente: ${bookingDetails.customer.full_name}, Tel: ${bookingDetails.customer.phone}. ${bookingDetails.address}, ${bookingDetails.zip_code}${
+      bookingDetails.notes ? `. Notas: ${bookingDetails.notes.replace(/[^A-Za-z0-9., -]/g, '').slice(0, 20)}...` : ''
+    }`
+    );
     // Format customer message
-    const customerMessage = `
-Obrigado por agendar com a M.M.C Services! Entraremos em contato brevemente!
-
-Confirmação de Agendamento:
-Serviço: ${bookingDetails.service.name}
-Data: ${bookingDetails.booking_date}
-Horário: ${bookingDetails.start_time} - ${bookingDetails.end_time}
-Morada: ${bookingDetails.address}
-Código Postal: ${bookingDetails.zip_code}
-
-Aguardamos a sua visita!`;
+        const customerMessage = sanitizeText(`
+    Obrigado por agendar com a M.M.C Services! Entraremos em contato brevemente!
+    
+    Confirmação de Agendamento:
+    Serviço: ${bookingDetails.service.name}
+    Data: ${bookingDetails.booking_date}
+    Horário: ${bookingDetails.start_time} - ${bookingDetails.end_time}
+    Morada: ${bookingDetails.address}
+    Código Postal: ${bookingDetails.zip_code}`
+    );
 
     // Send SMS to admin
     const adminResult = await sendSMS(ADMIN_PHONE, adminMessage);
