@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 const TWILIO_ACCOUNT_SID = import.meta.env.VITE_TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH_TOKEN = import.meta.env.VITE_TWILIO_AUTH_TOKEN;
 const TWILIO_PHONE_NUMBER = import.meta.env.VITE_TWILIO_PHONE_NUMBER;
-const ADMIN_PHONE = '+351933659453';
+const ADMIN_PHONE = '+351912137525';
 
 interface OrderNotification {
   orderDetails: {
@@ -97,7 +97,7 @@ export async function sendSMSNotification(notification: OrderNotification): Prom
     Morada: ${notification.orderDetails.customer.address}
     Cód. Postal: ${notification.orderDetails.customer.zip_code}
     ${notification.orderDetails.special_instructions 
-      ? `\nNotas: ${notification.orderDetails.special_instructions.replace(/[^A-Za-z0-9., -]/g, '').slice(0, 20)}...` 
+      ? `\nNotas: ${notification.orderDetails.special_instructions.replace(/[^A-Za-z0-9., -]/g, '').slice(0, 50)}...` 
       : ''}`
     )
     
@@ -193,7 +193,7 @@ export async function sendBookingNotification(bookingDetails: {
   
   const adminMessage = sanitizeText(
     `Nova Marcacao: ${bookingDetails.service.name}, ${bookingDetails.booking_date} ${bookingDetails.start_time}-${bookingDetails.end_time}. Cliente: ${bookingDetails.customer.full_name}, Tel: ${bookingDetails.customer.phone}. ${bookingDetails.address}, ${bookingDetails.zip_code}${
-      bookingDetails.notes ? `. Notas: ${bookingDetails.notes.replace(/[^A-Za-z0-9., -]/g, '').slice(0, 20)}...` : ''
+      bookingDetails.notes ? `. Notas: ${bookingDetails.notes.replace(/[^A-Za-z0-9., -]/g, '').slice(0, 50)}...` : ''
     }`
     );
     // Format customer message
